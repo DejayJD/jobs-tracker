@@ -14,6 +14,34 @@ A Next.js application for tracking job applications using a kanban-style board i
 - **Styling**: Tailwind CSS
 - **Language**: TypeScript
 - **UI Components**: Tamagui (configured for future use)
+- **Code Quality**: ESLint + Prettier
+
+## Code Quality
+
+This project uses ESLint for linting and Prettier for code formatting:
+
+- **ESLint**: Configured with Next.js recommended rules and Prettier compatibility
+- **Prettier**: Automatic code formatting with consistent style
+- **TypeScript**: Strict mode enabled with explicit `any` allowed
+
+### Editor Setup
+
+The project includes VS Code/Cursor settings that have been configured globally:
+- Set Prettier as the default formatter for all relevant file types
+- Enable format on save, paste, and type
+- Point to project-specific `.prettierrc` and `.prettierignore` files when available
+
+**Recommended Extensions:**
+- Prettier - Code formatter
+- ESLint
+- Tailwind CSS IntelliSense
+- TypeScript Importer
+
+**Format Document Command:**
+- **VS Code/Cursor**: `Shift + Alt + F` (or `Shift + Option + F` on Mac)
+- Files will also auto-format on save
+
+**Note:** Global settings have been applied to your Cursor installation, so these formatting rules will work in all your projects!
 
 ## Getting Started
 
@@ -59,6 +87,8 @@ jobs-tracker/
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check if code is formatted with Prettier
 
 ## Future Enhancements
 

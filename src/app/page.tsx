@@ -11,7 +11,8 @@ export default function Home() {
               Welcome to your personal job application kanban board!
             </p>
             <p className="text-base text-gray-500 mb-8">
-              Track your job applications, organize them by status, and never lose track of opportunities again.
+              Track your job applications, organize them by status, and never
+              lose track of opportunities again.
             </p>
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               Get Started
@@ -20,5 +21,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-  )
+  );
 }

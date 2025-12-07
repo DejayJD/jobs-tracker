@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['tamagui'],
+  transpilePackages: ["tamagui"],
 };
 
-module.exports = nextConfig
+module.exports = nextConfig;
