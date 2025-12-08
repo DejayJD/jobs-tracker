@@ -4,6 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:server": "nodemon --exec ts-node server/index.ts",
+    "server": "ts-node server/index.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:docker:up": "docker-compose up -d",
+    "db:docker:down": "docker-compose down",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -11,9 +19,18 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@tamagui/config": "^1.100.0",
     "@tamagui/next-theme": "^1.138.6",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "drizzle-kit": "^0.31.8",
+    "drizzle-orm": "^0.45.0",
+    "express": "^5.2.1",
     "next": "^14.2.15",
+    "postgres": "^3.4.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-native-web": "^0.21.2",
@@ -21,12 +38,16 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
+    "nodemon": "^3.1.11",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
