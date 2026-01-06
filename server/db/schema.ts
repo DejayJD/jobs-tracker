@@ -1,6 +1,14 @@
-import { pgTable, uuid, varchar, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+  pgEnum,
+  text,
+  smallint,
+} from "drizzle-orm/pg-core";
 
-export const statusEnum = pgEnum("status", ["recruiters", "inMotion", "sentApps"]);
+export const statusEnum = pgEnum("status", ["inMotion", "sentApps"]);
 
 export const recruiters = pgTable("recruiters", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -17,6 +25,16 @@ export const jobApplications = pgTable("job_applications", {
   recruiterId: uuid("recruiter_id").references(() => recruiters.id, {
     onDelete: "set null",
   }),
+  office: varchar("office", { length: 255 }),
+  compensation: varchar("compensation", { length: 255 }),
+  companySize: varchar("company_size", { length: 255 }),
+  questions: text("questions"),
+  pros: text("pros"),
+  cons: text("cons"),
+  vibeCheck: smallint("vibe_check"),
+  stage: varchar("stage", { length: 255 }),
+  source: varchar("source", { length: 255 }),
+  logo: varchar("logo", { length: 500 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

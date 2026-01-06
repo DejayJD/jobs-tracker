@@ -1,14 +1,15 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
 import * as schema from "./schema";
-import dotenv from "dotenv";
+import { config } from "dotenv";
+import { resolve } from "path";
 
-dotenv.config();
+// Load .env first, then .env.local (which will override .env values)
+config(); // Load .env
+config({ path: resolve(process.cwd(), ".env.local"), override: true }); // Override with .env.local
 
-const connectionString = process.env.DATABASE_URL || 
-  `postgresql://${process.env.DB_USER || "postgres"}:${process.env.DB_PASSWORD || "postgres"}@${process.env.DB_HOST || "localhost"}:${process.env.DB_PORT || "5432"}/${process.env.DB_NAME || "jobs_tracker"}`;
-
-const client = postgres(connectionString);
-export const db = drizzle(client, { schema });
+// Neon serverless driver (recommended by Vercel for Neon Postgres)
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle(sql, { schema });
 
 export * from "./schema";

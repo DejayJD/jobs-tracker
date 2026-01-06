@@ -15,40 +15,20 @@ import { CardData } from "@/components/Card";
 import { CreateCardModal } from "@/components/CreateCardModal";
 import {
   getBoardData,
-  createRecruiter,
   createJobApplication,
   updateJobApplication,
-  deleteRecruiter,
   deleteJobApplication,
   BoardData as APIBoardData,
 } from "@/lib/api";
 
-type ColumnId = "recruiters" | "inMotion" | "sentApps";
+type ColumnId = "inMotion" | "sentApps";
 
 interface BoardData {
-  recruiters: CardData[];
   inMotion: CardData[];
   sentApps: CardData[];
 }
 
-function getIconComponent(iconType: string) {
-  if (iconType === "recruiter") {
-    return (
-      <div className="w-8 h-8 rounded-full border-2 border-blue-500 flex items-center justify-center">
-        <svg
-          className="w-5 h-5 text-blue-500"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </div>
-    );
-  }
+function getIconComponent() {
   return (
     <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center">
       <svg
@@ -64,29 +44,23 @@ function getIconComponent(iconType: string) {
 
 function transformAPIDataToCardData(apiData: APIBoardData): BoardData {
   return {
-    recruiters: apiData.recruiters.map((item) => ({
-      id: item.id,
-      title: item.title,
-      icon: getIconComponent(item.icon),
-    })),
     inMotion: apiData.inMotion.map((item) => ({
       id: item.id,
       title: item.title,
       subtitle: item.subtitle,
-      icon: getIconComponent(item.icon),
+      icon: getIconComponent(),
     })),
     sentApps: apiData.sentApps.map((item) => ({
       id: item.id,
       title: item.title,
       subtitle: item.subtitle,
-      icon: getIconComponent(item.icon),
+      icon: getIconComponent(),
     })),
   };
 }
 
 export default function Home() {
   const [boardData, setBoardData] = useState<BoardData>({
-    recruiters: [],
     inMotion: [],
     sentApps: [],
   });
@@ -154,14 +128,6 @@ export default function Home() {
 
     // Update in backend
     try {
-      // If moving from/to recruiters, it's a recruiter, otherwise it's a job application
-      if (sourceColumn === "recruiters" || destinationColumn === "recruiters") {
-        // Recruiters can't be moved between columns via drag - they stay in recruiters
-        // This would need special handling if you want to allow moving recruiters
-        return;
-      }
-
-      // Update job application currentColumn
       await updateJobApplication(cardId, {
         currentColumn: destinationColumn,
       });
@@ -196,42 +162,48 @@ export default function Home() {
   }
 
   async function handleCreateCard(data: {
-    type: "job" | "recruiter";
     title: string;
     name: string;
+    office?: string;
+    compensation?: string;
+    companySize?: string;
+    questions?: string;
+    pros?: string;
+    cons?: string;
+    vibeCheck?: number;
+    stage?: string;
+    source?: string;
+    logo?: string;
   }) {
     if (!selectedColumn) return;
 
     try {
-      if (data.type === "recruiter") {
-        const newRecruiter = await createRecruiter(data.name);
-        const newCard: CardData = {
-          id: newRecruiter.id,
-          title: data.title,
-          icon: getIconComponent("recruiter"),
-        };
-        setBoardData((prev) => ({
-          ...prev,
-          recruiters: [...prev.recruiters, newCard],
-        }));
-      } else {
-        const newApplication = await createJobApplication({
-          companyName: data.title,
-          jobTitle: data.name,
-          currentColumn: selectedColumn,
-          recruiterId: null,
-        });
-        const newCard: CardData = {
-          id: newApplication.id,
-          title: newApplication.companyName,
-          subtitle: newApplication.jobTitle || undefined,
-          icon: getIconComponent("company"),
-        };
-        setBoardData((prev) => ({
-          ...prev,
-          [selectedColumn]: [...prev[selectedColumn], newCard],
-        }));
-      }
+      const newApplication = await createJobApplication({
+        companyName: data.title,
+        jobTitle: data.name,
+        currentColumn: selectedColumn,
+        recruiterId: null,
+        office: data.office ?? null,
+        compensation: data.compensation ?? null,
+        companySize: data.companySize ?? null,
+        questions: data.questions ?? null,
+        pros: data.pros ?? null,
+        cons: data.cons ?? null,
+        vibeCheck: data.vibeCheck ?? null,
+        stage: data.stage ?? null,
+        source: data.source ?? null,
+        logo: data.logo ?? null,
+      });
+      const newCard: CardData = {
+        id: newApplication.id,
+        title: newApplication.companyName,
+        subtitle: newApplication.jobTitle || undefined,
+        icon: getIconComponent(),
+      };
+      setBoardData((prev) => ({
+        ...prev,
+        [selectedColumn]: [...prev[selectedColumn], newCard],
+      }));
     } catch (err) {
       console.error("Failed to create card:", err);
       setError("Failed to create new card");
@@ -251,12 +223,7 @@ export default function Home() {
         return newData;
       });
 
-      // Delete from backend
-      if (columnId === "recruiters") {
-        await deleteRecruiter(cardId);
-      } else {
-        await deleteJobApplication(cardId);
-      }
+      await deleteJobApplication(cardId);
     } catch (err) {
       console.error("Failed to delete card:", err);
       setError("Failed to delete card");
@@ -295,14 +262,7 @@ export default function Home() {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-            <CardColumn
-              id="recruiters"
-              title="Recruiters"
-              cards={boardData.recruiters}
-              onAddCard={() => handleAddCard("recruiters")}
-              onDeleteCard={handleDeleteCard}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16">
             <CardColumn
               id="inMotion"
               title="In Motion"
@@ -323,7 +283,7 @@ export default function Home() {
               <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 w-64">
                 <div className="flex items-start gap-3">
                   {activeCard.icon && (
-                    <div className="flex-shrink-0 mt-0.5">{activeCard.icon}</div>
+                    <div className="shrink-0 mt-0.5">{activeCard.icon}</div>
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-gray-900 text-sm">

@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+const API_BASE_URL = "/api";
 
 export interface Recruiter {
   id: string;
@@ -11,18 +11,23 @@ export interface JobApplication {
   id: string;
   companyName: string;
   jobTitle: string | null;
-  currentColumn: "recruiters" | "inMotion" | "sentApps";
+  currentColumn: "inMotion" | "sentApps";
   recruiterId: string | null;
+  office: string | null;
+  compensation: string | null;
+  companySize: string | null;
+  questions: string | null;
+  pros: string | null;
+  cons: string | null;
+  vibeCheck: number | null;
+  stage: string | null;
+  source: string | null;
+  logo: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface BoardData {
-  recruiters: Array<{
-    id: string;
-    title: string;
-    icon: string;
-  }>;
   inMotion: Array<{
     id: string;
     title: string;
@@ -82,9 +87,11 @@ export async function getJobApplications(): Promise<JobApplication[]> {
 }
 
 export async function getJobApplicationsByStatus(
-  status: "recruiters" | "inMotion" | "sentApps"
+  status: "inMotion" | "sentApps"
 ): Promise<JobApplication[]> {
-  const response = await fetch(`${API_BASE_URL}/job-applications/status/${status}`);
+  const response = await fetch(
+    `${API_BASE_URL}/job-applications/status/${status}`
+  );
   if (!response.ok) throw new Error("Failed to fetch job applications");
   return response.json();
 }

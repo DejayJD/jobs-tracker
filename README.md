@@ -58,13 +58,37 @@ The project includes VS Code/Cursor settings that have been configured globally:
 npm install
 ```
 
-3. Run the development server:
+3. Set up environment variables:
+
+Create a `.env.local` file in the root directory with your Neon Postgres connection string:
+
+```bash
+# Neon Postgres Database Connection
+DATABASE_URL=postgresql://user:password@host.neon.tech/dbname?sslmode=require
+
+# Or use individual connection parameters:
+# DB_HOST=your-host.neon.tech
+# DB_PORT=5432
+# DB_NAME=your-database-name
+# DB_USER=your-username
+# DB_PASSWORD=your-password
+```
+
+**Note:** Get your connection string from your Neon dashboard. The `.env.local` file is git-ignored and will be used for local development. On Vercel, environment variables are automatically set when you add a Neon Postgres database.
+
+4. Run database migrations (if needed):
+
+```bash
+npm run db:push
+```
+
+5. Run the development server:
 
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Project Structure
 
@@ -84,11 +108,16 @@ jobs-tracker/
 ## Available Scripts
 
 - `npm run dev` - Start development server
+- `npm run dev:server` - Start Express backend server separately
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check if code is formatted with Prettier
+- `npm run db:generate` - Generate database migrations
+- `npm run db:migrate` - Run database migrations
+- `npm run db:push` - Push schema changes to database (development)
+- `npm run db:studio` - Open Drizzle Studio (database GUI)
 
 ## Future Enhancements
 
