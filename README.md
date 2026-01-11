@@ -72,9 +72,23 @@ DATABASE_URL=postgresql://user:password@host.neon.tech/dbname?sslmode=require
 # DB_NAME=your-database-name
 # DB_USER=your-username
 # DB_PASSWORD=your-password
+
+# Google Custom Search API (for automatic company logo fetching)
+# Optional - if not set, logo fetching will be skipped
+GOOGLE_API_KEY=your-google-api-key
+GOOGLE_CSE_ID=your-custom-search-engine-id
 ```
 
-**Note:** Get your connection string from your Neon dashboard. The `.env.local` file is git-ignored and will be used for local development. On Vercel, environment variables are automatically set when you add a Neon Postgres database.
+**Note:** 
+- Get your connection string from your Neon dashboard. The `.env.local` file is git-ignored and will be used for local development. On Vercel, environment variables are automatically set when you add a Neon Postgres database.
+- For automatic company logo fetching, you'll need to set up a Google Custom Search Engine:
+  1. Go to [Google Cloud Console](https://console.cloud.google.com/) and create a project
+  2. Enable the Custom Search API
+  3. Create an API key
+  4. Go to [Google Custom Search](https://programmablesearchengine.google.com/) and create a search engine
+  5. Enable "Search the entire web" and "Image search"
+  6. Copy your Search Engine ID (CSE ID)
+  7. Add both `GOOGLE_API_KEY` and `GOOGLE_CSE_ID` to your `.env.local` file
 
 4. Run database migrations (if needed):
 

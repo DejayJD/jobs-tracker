@@ -107,16 +107,6 @@ The server will start on `http://localhost:3001`
 ### Health Check
 - `GET /api/health` - Check if server is running
 
-### Recruiters
-- `GET /api/recruiters` - Get all recruiters
-- `GET /api/recruiters/:id` - Get recruiter by ID
-- `POST /api/recruiters` - Create new recruiter
-  ```json
-  { "name": "John Doe" }
-  ```
-- `PUT /api/recruiters/:id` - Update recruiter
-- `DELETE /api/recruiters/:id` - Delete recruiter
-
 ### Job Applications
 - `GET /api/job-applications` - Get all job applications
 - `GET /api/job-applications/status/:status` - Get applications by status
@@ -126,30 +116,32 @@ The server will start on `http://localhost:3001`
   {
     "companyName": "Acme Corp",
     "jobTitle": "Senior Engineer",
-    "status": "inMotion",
-    "recruiterId": "uuid-here" // optional
+    "status": "inMotion"
   }
   ```
 - `PUT /api/job-applications/:id` - Update application
 - `DELETE /api/job-applications/:id` - Delete application
 
 ### Board
-- `GET /api/board` - Get all board data (recruiters + applications organized by status)
+- `GET /api/board` - Get all board data (applications organized by status)
 
 ## Database Schema
-
-### Recruiters Table
-- `id` (UUID, Primary Key)
-- `name` (VARCHAR 255)
-- `created_at` (TIMESTAMP)
-- `updated_at` (TIMESTAMP)
 
 ### Job Applications Table
 - `id` (UUID, Primary Key)
 - `company_name` (VARCHAR 255)
 - `job_title` (VARCHAR 255, nullable)
-- `status` (ENUM: 'recruiters', 'inMotion', 'sentApps')
-- `recruiter_id` (UUID, Foreign Key to recruiters, nullable)
+- `current_column` (ENUM: 'inMotion', 'sentApps')
+- `office` (VARCHAR 255, nullable)
+- `compensation` (VARCHAR 255, nullable)
+- `company_size` (VARCHAR 255, nullable)
+- `questions` (TEXT, nullable)
+- `pros` (TEXT, nullable)
+- `cons` (TEXT, nullable)
+- `vibe_check` (SMALLINT, nullable)
+- `stage` (VARCHAR 255, nullable)
+- `source` (VARCHAR 255, nullable)
+- `logo` (VARCHAR 500, nullable)
 - `created_at` (TIMESTAMP)
 - `updated_at` (TIMESTAMP)
 

@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../server/db";
-import { jobApplications } from "../../../../server/db/schema";
+import { jobApplications, columns } from "../../../../server/db/schema";
+import { eq, isNull } from "drizzle-orm";
+import { searchCompanyLogo } from "../../../lib/logo-search";
 
-// GET all job applications
+// GET all job applications (excluding soft-deleted)
 export async function GET() {
   try {
-    const allApplications = await db.select().from(jobApplications);
+    const allApplications = await db
+      .select()
+      .from(jobApplications)
+      .where(isNull(jobApplications.deletedAt));
     return NextResponse.json(allApplications);
   } catch (error) {
     console.error("Error fetching job applications:", error);
@@ -24,21 +29,20 @@ export async function POST(request: NextRequest) {
       companyName,
       jobTitle,
       currentColumn,
-      status,
-      recruiterId,
+      status: legacyStatus,
       office,
       compensation,
       companySize,
-      questions,
-      pros,
-      cons,
+      notes,
+      status,
+      nextInterviewDate,
+      nextInterviewType,
       vibeCheck,
-      stage,
       source,
       logo,
     } = body;
     // Support both 'status' (legacy) and 'currentColumn' for backward compatibility
-    const column = currentColumn || status;
+    const column = currentColumn || legacyStatus;
 
     if (!companyName || !column) {
       return NextResponse.json(
@@ -47,12 +51,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const validColumns = ["inMotion", "sentApps"];
-    if (!validColumns.includes(column)) {
+    // Validate that the column exists in the database
+    const columnExists = await db
+      .select()
+      .from(columns)
+      .where(eq(columns.id, column))
+      .limit(1);
+
+    if (columnExists.length === 0) {
       return NextResponse.json(
-        { error: "Invalid currentColumn" },
+        { error: "Invalid currentColumn - column does not exist" },
         { status: 400 }
       );
+    }
+
+    // Fetch company logo if not explicitly provided
+    let logoUrl = logo || null;
+    if (!logo && companyName) {
+      try {
+        const fetchedLogo = await searchCompanyLogo(companyName);
+        if (fetchedLogo) {
+          logoUrl = fetchedLogo;
+        }
+      } catch (error) {
+        // Log error but don't fail the creation
+        console.error("Failed to fetch company logo:", error);
+      }
     }
 
     const [newApplication] = await db
@@ -61,17 +85,18 @@ export async function POST(request: NextRequest) {
         companyName,
         jobTitle,
         currentColumn: column as any,
-        recruiterId: recruiterId || null,
         office: office || null,
         compensation: compensation || null,
         companySize: companySize || null,
-        questions: questions || null,
-        pros: pros || null,
-        cons: cons || null,
+        notes: notes || null,
+        status: status || null,
+        nextInterviewDate: nextInterviewDate
+          ? new Date(nextInterviewDate)
+          : null,
+        nextInterviewType: nextInterviewType || null,
         vibeCheck: vibeCheck || null,
-        stage: stage || null,
         source: source || null,
-        logo: logo || null,
+        logo: logoUrl,
       })
       .returning();
 
@@ -84,4 +109,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

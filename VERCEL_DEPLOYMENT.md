@@ -164,7 +164,6 @@ The deployment uses:
   - All `/api/*` routes are handled by the Express app
   - Routes available:
     - `/api/health` - Health check
-    - `/api/recruiters` - Recruiter CRUD operations
     - `/api/job-applications` - Job application CRUD operations
     - `/api/board` - Board data endpoint
 

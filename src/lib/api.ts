@@ -1,8 +1,9 @@
 const API_BASE_URL = "/api";
 
-export interface Recruiter {
+export interface Column {
   id: string;
   name: string;
+  order: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -11,16 +12,15 @@ export interface JobApplication {
   id: string;
   companyName: string;
   jobTitle: string | null;
-  currentColumn: "inMotion" | "sentApps";
-  recruiterId: string | null;
+  currentColumn: string;
   office: string | null;
   compensation: string | null;
   companySize: string | null;
-  questions: string | null;
-  pros: string | null;
-  cons: string | null;
+  notes: string | null;
+  status: string | null;
+  nextInterviewDate: string | null;
+  nextInterviewType: string | null;
   vibeCheck: number | null;
-  stage: string | null;
   source: string | null;
   logo: string | null;
   createdAt: string;
@@ -28,55 +28,8 @@ export interface JobApplication {
 }
 
 export interface BoardData {
-  inMotion: Array<{
-    id: string;
-    title: string;
-    subtitle?: string;
-    icon: string;
-  }>;
-  sentApps: Array<{
-    id: string;
-    title: string;
-    subtitle?: string;
-    icon: string;
-  }>;
-}
-
-// Recruiters API
-export async function getRecruiters(): Promise<Recruiter[]> {
-  const response = await fetch(`${API_BASE_URL}/recruiters`);
-  if (!response.ok) throw new Error("Failed to fetch recruiters");
-  return response.json();
-}
-
-export async function createRecruiter(name: string): Promise<Recruiter> {
-  const response = await fetch(`${API_BASE_URL}/recruiters`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name }),
-  });
-  if (!response.ok) throw new Error("Failed to create recruiter");
-  return response.json();
-}
-
-export async function updateRecruiter(
-  id: string,
-  name: string
-): Promise<Recruiter> {
-  const response = await fetch(`${API_BASE_URL}/recruiters/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name }),
-  });
-  if (!response.ok) throw new Error("Failed to update recruiter");
-  return response.json();
-}
-
-export async function deleteRecruiter(id: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/recruiters/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) throw new Error("Failed to delete recruiter");
+  columns: Column[];
+  applications: Record<string, JobApplication[]>;
 }
 
 // Job Applications API
@@ -87,7 +40,7 @@ export async function getJobApplications(): Promise<JobApplication[]> {
 }
 
 export async function getJobApplicationsByStatus(
-  status: "inMotion" | "sentApps"
+  status: string
 ): Promise<JobApplication[]> {
   const response = await fetch(
     `${API_BASE_URL}/job-applications/status/${status}`
@@ -117,7 +70,13 @@ export async function updateJobApplication(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error("Failed to update job application");
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.error ||
+        `Failed to update job application: ${response.status} ${response.statusText}`
+    );
+  }
   return response.json();
 }
 
@@ -132,5 +91,22 @@ export async function deleteJobApplication(id: string): Promise<void> {
 export async function getBoardData(): Promise<BoardData> {
   const response = await fetch(`${API_BASE_URL}/board`);
   if (!response.ok) throw new Error("Failed to fetch board data");
+  return response.json();
+}
+
+// Columns API
+export async function getColumns(): Promise<Column[]> {
+  const response = await fetch(`${API_BASE_URL}/columns`);
+  if (!response.ok) throw new Error("Failed to fetch columns");
+  return response.json();
+}
+
+export async function createColumn(data: { name: string }): Promise<Column> {
+  const response = await fetch(`${API_BASE_URL}/columns`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error("Failed to create column");
   return response.json();
 }
